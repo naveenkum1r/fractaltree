@@ -1,151 +1,82 @@
 const canvas = document.getElementById('canvas1')
-const controlsform = document.getElementById('main')
-const generateButton = document.querySelector('.generate-tree-button')
-const settingcontrol = document.querySelector('.settings')
 const ctx = canvas.getContext('2d')
 canvas.width = window.innerWidth
 canvas.height = window.innerHeight
-let open = false
-
+let particlesArray = []
 window.addEventListener('resize', function () {
-  let tempwidth = canvas.width
-  canvas.height = window.innerHeight
   canvas.width = window.innerWidth
-  generateRandomTree()
+  canvas.height = window.innerHeight
+  particlesArray = []
+  init()
 })
 
-settingcontrol.addEventListener('click', function () {
-  if (!open) {
-    controlsform.style.display = 'grid'
-    settingcontrol.innerHTML = 'Close Settings'
-    open = true
-  } else {
-    controlsform.style.display = 'none'
-    settingcontrol.innerHTML = 'Open Settings'
-    open = false
-  }
+const mouse = {
+  x: undefined,
+  y: undefined,
+}
+
+canvas.addEventListener('click', function (event) {
+  mouse.x = event.x
+  mouse.y = event.y
 })
 
-let fruit = 0
+canvas.addEventListener('mousemove', function (event) {
+  mouse.x = event.x
+  mouse.y = event.y
+})
 
-class controls {
-  constructor(type, id, min, max, value) {
-    this.div = document.createElement('div')
-    controlsform.appendChild(this.div)
-    this.slider = document.createElement('input')
-    if (type == 'range') {
-      this.slider.setAttribute('min', min)
-      this.slider.setAttribute('max', max)
-    }
-    this.slider.setAttribute('type', type)
-    this.slider.setAttribute('id', id)
-    this.slider.setAttribute('value', value)
-    this.div.appendChild(this.slider)
-    this.label = document.createElement('Label')
-    this.label.htmlFor = id
-    this.label.innerHTML = id
-    this.div.appendChild(this.label)
+class Particle {
+  constructor(x, y) {
+    //this.x = mouse.x
+    //this.y = mouse.y
+    this.x = (x * canvas.width) / 4 + canvas.width / 2
+    this.y = (y * canvas.width) / 4 + canvas.height / 2
+    this.size = Math.random() * 5 + 1
+    this.speedX = Math.random() * 3 - 1.5
+    this.speedY = Math.random() * 3 - 1.5
   }
 
-  get value() {
-    return this.slider.value
+  update() {
+    this.x += this.speedX
+    this.y += this.speedY
   }
-
-  get control() {
-    return this.slider
-  }
-}
-
-function rgbToHex(r, g, b) {
-  return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)
-}
-
-function drawTree(startX, startY, len, angle, branchWidth, color1, color2, details, curve2, leafsize, blurcolor, fruitcolor) {
-  ctx.beginPath()
-  ctx.save()
-  ctx.strokeStyle = color1
-  ctx.fillStyle = color2
-  ctx.shadowBlur = 15
-  ctx.shadowColor = blurcolor
-  ctx.lineWidth = branchWidth
-  ctx.translate(startX, startY)
-  ctx.rotate(angle * (Math.PI / 180))
-  ctx.moveTo(0, 0)
-  // ctx.lineTo(0, -len)
-  if (angle > 0) {
-    ctx.bezierCurveTo(curve2, -len / 2, curve2, -len / 2, 0, -len)
-  } else {
-    ctx.bezierCurveTo(curve2, -len / 2, -curve2, -len / 2, 0, -len)
-  }
-  ctx.stroke()
-
-  if (len < details) {
+  draw() {
+    ctx.fillStyle = 'red'
     ctx.beginPath()
-    ctx.arc(0, -len, leafsize, 0, Math.PI / 2)
+    ctx.arc(this.x, this.y, 5, 0, Math.PI * 2)
     ctx.fill()
-    if (fruit % 20 == 0) {
-      ctx.fillStyle = fruitcolor
-      ctx.arc(0, -len, leafsize / 2, -Math.PI, Math.PI)
-      ctx.fill()
-    }
-    ctx.restore()
-    fruit++
-    return
   }
-  drawTree(0, -len, len * 0.75, angle + curve, branchWidth * 0.6, color1, color2, details, curve2, leafsize, blurcolor, fruitcolor)
-  drawTree(0, -len, len * 0.75, angle - curve, branchWidth * 0.6, color1, color2, details, curve2, leafsize, blurcolor, fruitcolor)
-
-  ctx.restore()
 }
 
-function generateRandomTree() {
-  controlsform.innerHTML = ''
-  let controlarray = []
-  let len = new controls('range', 'Length', 20, 200, Math.floor(Math.random() * 100 + 100))
-  controlarray.push(len)
-  let centerPointX = canvas.width / 2
-  let angle = new controls('range', 'Angle', -70, 70, 0)
-  controlarray.push(angle)
-  let details = new controls('range', 'Leafs', -15, -5, -10)
-  controlarray.push(details)
-  let branchWidth = new controls('range', 'Branch_Width', 1, 71, Math.random() * 100 + 1)
-  controlarray.push(branchWidth)
-  let color1 = new controls('color', 'Branch_color', 0, 0, rgbToHex(Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255)))
-  let color2 = new controls('color', 'Leaf_Color', 0, 0, rgbToHex(Math.floor(Math.random() * 255), Math.floor(Math.random() * 255), Math.floor(Math.random() * 255)))
-  let blurcolor = new controls('color', 'Blur_color', 0, 0, rgbToHex(0, 0, 0))
-  let fruitcolor = new controls('color', 'Fruit_color', 0, 0, rgbToHex(255, 0, 0))
-  controlarray.push(color1)
-  controlarray.push(color2)
-  controlarray.push(blurcolor)
-  controlarray.push(fruitcolor)
-  generateButton.style.background = color1.value
-  curve = Math.random() * 20 + 2
-  let curve2 = new controls('range', 'Branch_Curve', 0, 80, Math.random() * 50)
-  controlarray.push(curve2)
-  let leafSize = new controls('range', 'Leaf_Size', 5, 30, Math.random() * 20 + 5)
-  controlarray.push(leafSize)
+let numPoints = 1000
+let turnFraction = 1.6180339887498948482045868343656381177203091798057628621354486227052604628189024497072072041893911374
+function init() {
+  particlesArray = []
+  for (let i = 0; i < numPoints; i++) {
+    let dst = Math.pow(i / numPoints, 0.5)
+    //let dst = i / numPoints
+    let angle = 2 * Math.PI * turnFraction * i
+    let x = dst * Math.cos(angle)
+    let y = dst * Math.sin(angle)
+    particlesArray.push(new Particle(x, y))
+  }
+  handleParticles()
+  if (turnFraction < 1.618033) {
+    turnFraction = turnFraction + 0.00001
+  }
+}
+
+function handleParticles() {
+  for (let i = 0; i < particlesArray.length; i++) {
+    //particlesArray[i].update()
+    particlesArray[i].draw()
+  }
+}
+
+function animate() {
   ctx.clearRect(0, 0, canvas.width, canvas.height)
-  drawTree(centerPointX, canvas.height - 80, len.value, angle.value / 2, branchWidth.value, color1.value, color2.value, -details.value, curve2.value, leafSize.value, blurcolor.value, fruitcolor.value)
-
-  controlarray.forEach((con) => {
-    con.control.oninput = function () {
-      generateButton.style.background = color1.value
-      ctx.clearRect(0, 0, canvas.width, canvas.height)
-      drawTree(centerPointX, canvas.height - 80, len.value, angle.value / 2, branchWidth.value, color1.value, color2.value, -details.value, curve2.value, leafSize.value, blurcolor.value, fruitcolor.value)
-    }
-  })
+  init()
+  requestAnimationFrame(animate)
 }
 
-document.querySelector('.download').addEventListener('click', () => {
-  var image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream')
-
-  var element = document.createElement('a')
-  var filename = 'test.png'
-  element.setAttribute('href', image)
-  element.setAttribute('download', filename)
-
-  element.click()
-})
-
-generateButton.addEventListener('click', generateRandomTree)
-generateRandomTree()
+animate()
