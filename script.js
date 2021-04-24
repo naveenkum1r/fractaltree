@@ -8,8 +8,9 @@ canvas.height = window.innerHeight
 let open = false
 
 window.addEventListener('resize', function () {
-  canvas.width = window.innerWidth
+  let tempwidth = canvas.width
   canvas.height = window.innerHeight
+  canvas.width = window.innerWidth
   generateRandomTree()
 })
 
@@ -135,9 +136,16 @@ function generateRandomTree() {
   })
 }
 
-function gen_controls_vals() {
-  let centerPointX = canvas.width / 2
-}
+document.querySelector('.download').addEventListener('click', () => {
+  var image = canvas.toDataURL('image/png').replace('image/png', 'image/octet-stream')
+
+  var element = document.createElement('a')
+  var filename = 'test.png'
+  element.setAttribute('href', image)
+  element.setAttribute('download', filename)
+
+  element.click()
+})
 
 generateButton.addEventListener('click', generateRandomTree)
 generateRandomTree()
