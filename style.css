@@ -1,0 +1,72 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+h1 {
+  position: absolute;
+  color: black;
+  display: inline;
+  width: 100%;
+  margin: 0 auto;
+  text-align: center;
+  z-index: 10;
+}
+
+#canvas1 {
+  position: absolute;
+  background: white;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+}
+
+#main {
+  z-index: 1;
+  display: grid;
+  position: absolute;
+  padding: 20px;
+  border: 2px solid cornflowerblue;
+}
+#main::before {
+  content: 'Controls';
+  display: inline;
+  margin: 0 auto;
+  padding-bottom: 20px;
+  font-weight: bold;
+}
+
+#main > div {
+  display: grid;
+  grid-auto-flow: column;
+  padding-bottom: 5px;
+}
+
+input {
+  grid-column: 2;
+}
+label {
+  grid-column: 1;
+  width: 100px;
+}
+
+.generate-tree-button {
+  cursor: pointer;
+  outline: none;
+  border: none;
+  position: absolute;
+  left: 0;
+  bottom: 5%;
+  z-index: 10;
+  left: 50%;
+  transform: translate(-50%, 0);
+  padding: 20px 30px;
+  border-radius: 50px;
+  background: brown;
+  color: white;
+  font-size: 20px;
+  width: 300px;
+  overflow: hidden;
+}
