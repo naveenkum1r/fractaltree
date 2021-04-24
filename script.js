@@ -1,14 +1,28 @@
 const canvas = document.getElementById('canvas1')
 const controlsform = document.getElementById('main')
 const generateButton = document.querySelector('.generate-tree-button')
+const settingcontrol = document.querySelector('.settings')
 const ctx = canvas.getContext('2d')
 canvas.width = window.innerWidth
 canvas.height = window.innerHeight
+let open = false
 
 window.addEventListener('resize', function () {
   canvas.width = window.innerWidth
   canvas.height = window.innerHeight
   generateRandomTree()
+})
+
+settingcontrol.addEventListener('click', function () {
+  if (!open) {
+    controlsform.style.display = 'grid'
+    settingcontrol.innerHTML = 'Close Settings'
+    open = true
+  } else {
+    controlsform.style.display = 'none'
+    settingcontrol.innerHTML = 'Open Settings'
+    open = false
+  }
 })
 
 let fruit = 0
